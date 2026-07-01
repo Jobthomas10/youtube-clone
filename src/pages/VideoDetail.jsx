@@ -273,10 +273,8 @@ const VideoDetail = () => {
             Up Next
           </Typography>
           
-          {/* Related videos stacked in single column */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Videos videos={relatedVideos} isLoading={false} direction="column" />
-          </Box>
+          {/* Related videos responsive grid/column stack */}
+          <Videos videos={relatedVideos} isLoading={false} layout="related" />
         </Grid>
       </Grid>
     </Box>

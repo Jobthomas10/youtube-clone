@@ -28,7 +28,8 @@ const SearchBar = () => {
         boxShadow: 'none',
         display: 'flex',
         alignItems: 'center',
-        width: { xs: '150px', sm: '300px', md: '450px', lg: '600px' },
+        width: { xs: '100%', sm: '300px', md: '450px', lg: '600px' },
+        maxWidth: { xs: '200px', sm: '100%' },
         height: '40px',
         overflow: 'hidden',
         backgroundColor: (theme) =>

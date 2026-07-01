@@ -1,5 +1,5 @@
-import React from 'react';
-import { Stack, Button, Box } from '@mui/material';
+import React, { useContext } from 'react';
+import { Stack, Button, Box, Divider, Typography } from '@mui/material';
 
 import HomeIcon from '@mui/icons-material/Home';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
@@ -9,6 +9,13 @@ import NewspaperIcon from '@mui/icons-material/Newspaper';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import SchoolIcon from '@mui/icons-material/School';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
+
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import HistoryIcon from '@mui/icons-material/History';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+
+import { AppContext } from '../App';
 
 export const categories = [
   { name: 'Home', icon: <HomeIcon /> },
@@ -22,6 +29,8 @@ export const categories = [
 ];
 
 const Sidebar = ({ selectedCategory, setSelectedCategory, isMobile, onCloseMobileDrawer }) => {
+  const { setFavoritesOpen, setHistoryOpen, darkMode, toggleTheme } = useContext(AppContext);
+
   const handleCategoryClick = (categoryName) => {
     setSelectedCategory(categoryName);
     if (isMobile && onCloseMobileDrawer) {
@@ -29,26 +38,40 @@ const Sidebar = ({ selectedCategory, setSelectedCategory, isMobile, onCloseMobil
     }
   };
 
+  const handleLibraryAction = (action) => {
+    if (isMobile && onCloseMobileDrawer) {
+      onCloseMobileDrawer();
+    }
+    
+    // Tiny delay to let the mobile sidebar close smoothly before drawer pops up
+    setTimeout(() => {
+      if (action === 'favorites') setFavoritesOpen(true);
+      if (action === 'history') setHistoryOpen(true);
+      if (action === 'theme') toggleTheme();
+    }, 150);
+  };
+
   return (
     <Stack
-      direction={{ xs: 'row', md: 'column' }}
+      direction="column"
       sx={{
         overflowY: 'auto',
-        height: { xs: 'auto', md: '92vh' },
-        width: { xs: '100%', md: '240px' },
+        height: isMobile ? '100%' : '92vh',
+        width: isMobile ? '100%' : '240px',
         borderRight: (theme) => 
           isMobile ? 'none' : `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
         backgroundColor: 'background.default',
         py: 2,
-        px: { xs: 1, md: 2 },
+        px: 2,
         flexShrink: 0,
         gap: 0.5,
-        scrollbarWidth: 'none', // Firefox
+        scrollbarWidth: 'none',
         '&::-webkit-scrollbar': {
-          display: 'none', // Safari & Chrome
+          display: 'none',
         },
       }}
     >
+      {/* Category Section */}
       {categories.map((category) => {
         const isSelected = category.name === selectedCategory;
 
@@ -79,12 +102,10 @@ const Sidebar = ({ selectedCategory, setSelectedCategory, isMobile, onCloseMobil
               color: 'text.primary',
               fontWeight: isSelected ? 'bold' : 'normal',
               width: '100%',
-              minWidth: { xs: '120px', md: 'auto' },
               '&:hover': {
                 backgroundColor: (theme) => 
                   theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.03)',
               },
-              // Text layout
               fontSize: '0.9rem',
               '& .MuiButton-startIcon': {
                 margin: 0,
@@ -95,6 +116,89 @@ const Sidebar = ({ selectedCategory, setSelectedCategory, isMobile, onCloseMobil
           </Button>
         );
       })}
+
+      <Divider sx={{ my: 2, borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
+
+      {/* Library Section */}
+      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 'bold', px: 2, mb: 1, letterSpacing: '0.5px' }}>
+        LIBRARY
+      </Typography>
+
+      <Button
+        onClick={() => handleLibraryAction('favorites')}
+        startIcon={
+          <Box sx={{ color: 'text.primary', mr: 1.5, display: 'flex', alignItems: 'center' }}>
+            <FavoriteIcon />
+          </Box>
+        }
+        sx={{
+          justifyContent: 'flex-start',
+          px: 2,
+          py: 1.2,
+          borderRadius: '10px',
+          color: 'text.primary',
+          width: '100%',
+          '&:hover': {
+            backgroundColor: (theme) => 
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.03)',
+          },
+          fontSize: '0.9rem',
+          '& .MuiButton-startIcon': { margin: 0 }
+        }}
+      >
+        Favorites
+      </Button>
+
+      <Button
+        onClick={() => handleLibraryAction('history')}
+        startIcon={
+          <Box sx={{ color: 'text.primary', mr: 1.5, display: 'flex', alignItems: 'center' }}>
+            <HistoryIcon />
+          </Box>
+        }
+        sx={{
+          justifyContent: 'flex-start',
+          px: 2,
+          py: 1.2,
+          borderRadius: '10px',
+          color: 'text.primary',
+          width: '100%',
+          '&:hover': {
+            backgroundColor: (theme) => 
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.03)',
+          },
+          fontSize: '0.9rem',
+          '& .MuiButton-startIcon': { margin: 0 }
+        }}
+      >
+        Watch History
+      </Button>
+
+      {/* Theme toggle item (especially useful inside mobile drawer overlay) */}
+      <Button
+        onClick={() => handleLibraryAction('theme')}
+        startIcon={
+          <Box sx={{ color: 'text.primary', mr: 1.5, display: 'flex', alignItems: 'center' }}>
+            {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+          </Box>
+        }
+        sx={{
+          justifyContent: 'flex-start',
+          px: 2,
+          py: 1.2,
+          borderRadius: '10px',
+          color: 'text.primary',
+          width: '100%',
+          '&:hover': {
+            backgroundColor: (theme) => 
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.03)',
+          },
+          fontSize: '0.9rem',
+          '& .MuiButton-startIcon': { margin: 0 }
+        }}
+      >
+        {darkMode ? 'Light Theme' : 'Dark Theme'}
+      </Button>
     </Stack>
   );
 };

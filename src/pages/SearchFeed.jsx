@@ -76,7 +76,7 @@ const SearchFeed = () => {
 
   return (
     <Box 
-      p={3} 
+      p={{ xs: 1.5, sm: 2, md: 3 }} 
       sx={{ 
         overflowY: 'auto', 
         minHeight: '92vh', 

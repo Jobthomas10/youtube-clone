@@ -1,36 +1,21 @@
-import React, { useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Stack, Box, IconButton, Badge, Drawer, Typography, List, ListItem, 
-  ListItemButton, ListItemText, Button, Tooltip, Divider, useTheme
-} from '@mui/material';
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { Stack, IconButton, Badge, Typography, Tooltip, useTheme } from '@mui/material';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import HistoryIcon from '@mui/icons-material/History';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ClearAllIcon from '@mui/icons-material/ClearAll';
 
 import SearchBar from './SearchBar';
 import { AppContext } from '../App';
 
 const Navbar = ({ onToggleMobileSidebar }) => {
   const theme = useTheme();
-  const navigate = useNavigate();
   const { 
-    favorites, toggleFavorite, watchHistory, clearHistory, darkMode, toggleTheme 
+    favorites, darkMode, toggleTheme, setFavoritesOpen, setHistoryOpen 
   } = useContext(AppContext);
-
-  const [favoritesOpen, setFavoritesOpen] = useState(false);
-  const [historyOpen, setHistoryOpen] = useState(false);
-
-  const handleVideoDrawerClick = (videoId) => {
-    setFavoritesOpen(false);
-    setHistoryOpen(false);
-    navigate(`/video/${videoId}`);
-  };
 
   return (
     <Stack
@@ -78,8 +63,13 @@ const Navbar = ({ onToggleMobileSidebar }) => {
       {/* Middle: SearchBar */}
       <SearchBar />
 
-      {/* Right: Actions */}
-      <Stack direction="row" alignItems="center" gap={{ xs: 0.5, sm: 1.5 }}>
+      {/* Right: Actions (Hidden on mobile to preserve layout integrity) */}
+      <Stack 
+        direction="row" 
+        alignItems="center" 
+        gap={{ xs: 0.5, sm: 1.5 }}
+        sx={{ display: { xs: 'none', sm: 'flex' } }}
+      >
         {/* Theme Toggle */}
         <Tooltip title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}>
           <IconButton onClick={toggleTheme} sx={{ color: 'text.primary' }}>
@@ -103,135 +93,6 @@ const Navbar = ({ onToggleMobileSidebar }) => {
           </IconButton>
         </Tooltip>
       </Stack>
-
-      {/* FAVORITES DRAWER */}
-      <Drawer
-        anchor="right"
-        open={favoritesOpen}
-        onClose={() => setFavoritesOpen(false)}
-        PaperProps={{
-          sx: { width: { xs: '280px', sm: '380px' }, p: 3 }
-        }}
-      >
-        <Typography variant="h6" fontWeight={700} gutterBottom display="flex" alignItems="center" gap={1}>
-          <FavoriteIcon sx={{ color: '#ff0000' }} /> Favorite Videos
-        </Typography>
-        <Divider sx={{ my: 2 }} />
-        
-        {favorites.length === 0 ? (
-          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="70vh" gap={2}>
-            <FavoriteIcon sx={{ fontSize: '4rem', color: 'action.disabled' }} />
-            <Typography variant="body1" color="text.secondary">No favorites saved yet.</Typography>
-          </Box>
-        ) : (
-          <List sx={{ overflowY: 'auto', flex: 1 }}>
-            {favorites.map((video) => {
-              const id = video.id?.videoId || video.id;
-              const thumbnail = video.snippet?.thumbnails?.medium?.url;
-              return (
-                <ListItem 
-                  key={id} 
-                  disablePadding
-                  secondaryAction={
-                    <IconButton edge="end" aria-label="delete" onClick={() => toggleFavorite(video)}>
-                      <DeleteIcon color="error" />
-                    </IconButton>
-                  }
-                  sx={{ mb: 1.5, borderBottom: '1px solid rgba(0,0,0,0.05)', pb: 1 }}
-                >
-                  <ListItemButton 
-                    onClick={() => handleVideoDrawerClick(id)}
-                    sx={{ p: 0.5, borderRadius: '8px', gap: 1.5 }}
-                  >
-                    <Box sx={{ width: 100, height: 56, borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
-                      <img src={thumbnail} alt={video.snippet?.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </Box>
-                    <ListItemText 
-                      primary={video.snippet?.title} 
-                      primaryTypographyProps={{ 
-                        variant: 'body2', 
-                        fontWeight: 600,
-                        noWrap: true,
-                        sx: { color: 'text.primary' }
-                      }}
-                      secondary={video.snippet?.channelTitle}
-                      secondaryTypographyProps={{ variant: 'caption', noWrap: true }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
-          </List>
-        )}
-      </Drawer>
-
-      {/* WATCH HISTORY DRAWER */}
-      <Drawer
-        anchor="right"
-        open={historyOpen}
-        onClose={() => setHistoryOpen(false)}
-        PaperProps={{
-          sx: { width: { xs: '280px', sm: '380px' }, p: 3 }
-        }}
-      >
-        <Stack direction="row" justifyContent="space-between" alignItems="center" gutterBottom>
-          <Typography variant="h6" fontWeight={700} display="flex" alignItems="center" gap={1}>
-            <HistoryIcon sx={{ color: 'primary.main' }} /> Watch History
-          </Typography>
-          {watchHistory.length > 0 && (
-            <Button 
-              size="small" 
-              color="error" 
-              startIcon={<ClearAllIcon />}
-              onClick={clearHistory}
-            >
-              Clear
-            </Button>
-          )}
-        </Stack>
-        <Divider sx={{ my: 2 }} />
-
-        {watchHistory.length === 0 ? (
-          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="70vh" gap={2}>
-            <HistoryIcon sx={{ fontSize: '4rem', color: 'action.disabled' }} />
-            <Typography variant="body1" color="text.secondary">No watch history available.</Typography>
-          </Box>
-        ) : (
-          <List sx={{ overflowY: 'auto', flex: 1 }}>
-            {watchHistory.map((video, idx) => {
-              const id = video.id?.videoId || video.id;
-              const thumbnail = video.snippet?.thumbnails?.medium?.url;
-              return (
-                <ListItem 
-                  key={`${id}-${idx}`} 
-                  disablePadding
-                  sx={{ mb: 1.5, borderBottom: '1px solid rgba(0,0,0,0.05)', pb: 1 }}
-                >
-                  <ListItemButton 
-                    onClick={() => handleVideoDrawerClick(id)}
-                    sx={{ p: 0.5, borderRadius: '8px', gap: 1.5 }}
-                  >
-                    <Box sx={{ width: 100, height: 56, borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
-                      <img src={thumbnail} alt={video.snippet?.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </Box>
-                    <ListItemText 
-                      primary={video.snippet?.title} 
-                      primaryTypographyProps={{ 
-                        variant: 'body2', 
-                        fontWeight: 600,
-                        noWrap: true,
-                        sx: { color: 'text.primary' }
-                      }}
-                      secondary={video.snippet?.channelTitle}
-                      secondaryTypographyProps={{ variant: 'caption', noWrap: true }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
-          </List>
-        )}
-      </Drawer>
     </Stack>
   );
 };

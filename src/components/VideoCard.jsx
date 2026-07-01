@@ -56,7 +56,7 @@ export const formatTimeAgo = (dateString) => {
   return 'Just now';
 };
 
-const VideoCard = ({ video }) => {
+const VideoCard = ({ video, layout }) => {
   const { favorites, toggleFavorite, addToHistory } = useContext(AppContext);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -78,6 +78,116 @@ const VideoCard = ({ video }) => {
   const channelTitle = video?.snippet?.channelTitle || 'Unknown Channel';
   const publishedAt = video?.snippet?.publishedAt;
   const viewCount = video?.statistics?.viewCount;
+
+  const isHorizontal = layout === 'horizontal';
+
+  if (isHorizontal) {
+    return (
+      <Card 
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={handleCardClick}
+        sx={{ 
+          display: 'flex',
+          flexDirection: 'row',
+          width: '100%',
+          boxShadow: 'none', 
+          borderRadius: 0, 
+          backgroundColor: 'transparent',
+          cursor: 'pointer',
+          gap: '8px',
+          mb: 1.5
+        }}
+      >
+        <Link to={videoId ? `/video/${videoId}` : `/video/dQw4w9WgXcQ`} style={{ textDecoration: 'none', display: 'flex', width: '100%', gap: '8px' }}>
+          {/* Left: Thumbnail */}
+          <Box sx={{ width: { xs: '130px', sm: '150px', md: '160px' }, flexShrink: 0, position: 'relative', pt: { xs: '73px', sm: '84.37px', md: '90px' }, borderRadius: '8px', overflow: 'hidden', backgroundColor: '#000' }}>
+            <CardMedia
+              component="img"
+              image={thumbnail || 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=500&auto=format&fit=crop&q=60'}
+              alt={title}
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                transition: 'transform 0.4s ease',
+                transform: isHovered ? 'scale(1.03)' : 'scale(1)',
+              }}
+            />
+            {/* Heart Favorite Overlay */}
+            <Box 
+              sx={{ 
+                position: 'absolute', 
+                top: 4, 
+                right: 4, 
+                zIndex: 10,
+                opacity: isHovered || isFavorited ? 1 : 0,
+                transition: 'opacity 0.2s ease-in-out',
+              }}
+            >
+              <IconButton 
+                onClick={handleFavoriteClick}
+                size="small"
+                sx={{ 
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)', 
+                  color: isFavorited ? '#ff0000' : '#ffffff',
+                  p: '4px',
+                  '&:hover': { 
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    color: '#ff0000',
+                  } 
+                }}
+              >
+                <FavoriteIcon sx={{ fontSize: '14px' }} />
+              </IconButton>
+            </Box>
+          </Box>
+
+          {/* Right: Text Metadata */}
+          <Box sx={{ flex: 1, minWidth: 0, pt: '2px' }}>
+            <Typography 
+              variant="body2" 
+              fontWeight={600} 
+              sx={{ 
+                color: 'text.primary',
+                lineHeight: '1.1rem',
+                maxHeight: '2.2rem',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                mb: '3px',
+                fontSize: '0.85rem'
+              }}
+            >
+              {title}
+            </Typography>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: 'text.secondary', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '2px',
+                mb: '1px',
+                '&:hover': { color: 'text.primary' }
+              }}
+            >
+              {channelTitle}
+              <CheckCircleIcon sx={{ fontSize: '10px', color: 'gray' }} />
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
+              {formatViews(viewCount)} • {formatTimeAgo(publishedAt)}
+            </Typography>
+          </Box>
+        </Link>
+      </Card>
+    );
+  }
 
   return (
     <Card 

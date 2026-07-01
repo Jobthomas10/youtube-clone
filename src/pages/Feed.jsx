@@ -92,7 +92,7 @@ const Feed = ({ selectedCategory, setSelectedCategory }) => {
   }, [nextPageToken, fetchVideos]);
 
   return (
-    <Stack sx={{ flexDirection: { sx: 'column', md: 'row' }, minHeight: '92vh' }}>
+    <Stack sx={{ flexDirection: { xs: 'column', md: 'row' }, minHeight: '92vh' }}>
       {/* Sidebar: Visible on desktop, hidden on mobile */}
       <Box sx={{ display: { xs: 'none', md: 'block' } }}>
         <Sidebar 
@@ -104,7 +104,7 @@ const Feed = ({ selectedCategory, setSelectedCategory }) => {
 
       {/* Main Video Area */}
       <Box 
-        p={3} 
+        p={{ xs: 1.5, sm: 2, md: 3 }} 
         sx={{ 
           overflowY: 'auto', 
           flex: 1, 
