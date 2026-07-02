@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Stack, IconButton, Badge, Typography, Tooltip, useTheme } from '@mui/material';
+import { Stack, IconButton, Badge, Typography, Tooltip, useTheme, Box } from '@mui/material';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -18,12 +18,12 @@ const Navbar = ({ onToggleMobileSidebar }) => {
   } = useContext(AppContext);
 
   return (
-    <Stack
-      direction="row"
-      alignItems="center"
-      justifyContent="space-between"
-      p={2}
+    <Box
       sx={{
+        display: 'grid',
+        gridTemplateColumns: '1fr auto 1fr',
+        alignItems: 'center',
+        p: 2,
         position: 'sticky',
         background: theme.palette.mode === 'dark' ? '#0f0f0f' : '#ffffff',
         top: 0,
@@ -61,12 +61,15 @@ const Navbar = ({ onToggleMobileSidebar }) => {
       </Stack>
 
       {/* Middle: SearchBar */}
-      <SearchBar />
+      <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+        <SearchBar />
+      </Box>
 
       {/* Right: Actions (Hidden on mobile to preserve layout integrity) */}
       <Stack 
         direction="row" 
         alignItems="center" 
+        justifyContent="flex-end"
         gap={{ xs: 0.5, sm: 1.5 }}
         sx={{ display: { xs: 'none', sm: 'flex' } }}
       >
@@ -93,7 +96,7 @@ const Navbar = ({ onToggleMobileSidebar }) => {
           </IconButton>
         </Tooltip>
       </Stack>
-    </Stack>
+    </Box>
   );
 };
 
