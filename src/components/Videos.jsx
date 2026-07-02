@@ -76,33 +76,46 @@ const Videos = ({ videos, isLoading, layout = 'grid' }) => {
   // Search layout is always horizontal. Related is horizontal on desktop and mobile, but grid on tablet.
   const useHorizontal = layout === 'horizontal' || layout === 'search' || (layout === 'related' && (isLargeScreen || isSmallScreen));
   
-  // Calculate Grid sizes dynamically based on screen and layout settings
-  const getGridSizes = () => {
+  // Calculate Grid columns dynamically based on layout settings and responsive breakpoints
+  const getGridTemplateColumns = () => {
     if (useHorizontal) {
-      // Horizontal cards take up 100% of their container width
-      return { xs: 12 };
+      return '1fr';
     }
     if (layout === 'related') {
-      // On tablet, stack related videos in a 2-column or 3-column grid
-      return { xs: 12, sm: 6, md: 4 };
+      // Related videos grid for tablet: 2 columns on sm, 3 columns on md
+      return {
+        xs: '1fr',
+        sm: 'repeat(2, 1fr)',
+        md: 'repeat(3, 1fr)',
+      };
     }
-    // Default Home Feed: 1 col on mobile, 2 on tablet, 3 on md, 4 on lg, 6 on xl
-    return { xs: 12, sm: 6, md: 4, lg: 3, xl: 2 };
+    // Default Home Feed: 1 column on mobile, 2 on tablet, 3 on laptop, 4 on desktop, 5 on extra-large
+    return {
+      xs: '1fr',
+      sm: 'repeat(2, 1fr)',
+      md: 'repeat(3, 1fr)',
+      lg: 'repeat(4, 1fr)',
+      xl: 'repeat(5, 1fr)',
+    };
   };
 
-  const gridSizes = getGridSizes();
+  const gridTemplateColumns = getGridTemplateColumns();
   const cardLayout = layout === 'search' ? 'search' : (useHorizontal ? 'horizontal' : 'vertical');
+  const gap = useHorizontal ? (layout === 'search' ? '20px' : '12px') : '24px';
 
   if (isLoading && (!videos || videos.length === 0)) {
     return (
-      <Box sx={{ width: '100%', overflow: 'hidden' }}>
-        <Grid container spacing={2}>
-          {Array.from(new Array(8)).map((_, index) => (
-            <Grid item {...gridSizes} key={index}>
-              <VideoSkeleton layout={cardLayout} />
-            </Grid>
-          ))}
-        </Grid>
+      <Box 
+        sx={{ 
+          display: 'grid',
+          gridTemplateColumns: gridTemplateColumns,
+          gap: gap,
+          width: '100%'
+        }}
+      >
+        {Array.from(new Array(8)).map((_, index) => (
+          <VideoSkeleton key={index} layout={cardLayout} />
+        ))}
       </Box>
     );
   }
@@ -110,30 +123,31 @@ const Videos = ({ videos, isLoading, layout = 'grid' }) => {
   if (!videos?.length) return null;
 
   return (
-    <Box sx={{ width: '100%', overflow: 'hidden' }}>
-      <Grid container spacing={2}>
-        {videos.map((item, idx) => {
-          // Fix: Extract string video ID. Skip objects without videoId (like channels/playlists)
-          const videoId = typeof item.id === 'object' ? item.id?.videoId : item.id;
-          if (!videoId) return null;
+    <Box 
+      sx={{ 
+        display: 'grid',
+        gridTemplateColumns: gridTemplateColumns,
+        gap: gap,
+        width: '100%'
+      }}
+    >
+      {videos.map((item, idx) => {
+        // Fix: Extract string video ID. Skip objects without videoId (like channels/playlists)
+        const videoId = typeof item.id === 'object' ? item.id?.videoId : item.id;
+        if (!videoId) return null;
 
-          return (
-            <Grid item {...gridSizes} key={`${videoId}-${idx}`}>
-              <VideoCard video={item} layout={cardLayout} />
-            </Grid>
-          );
-        })}
+        return (
+          <VideoCard video={item} key={`${videoId}-${idx}`} layout={cardLayout} />
+        );
+      })}
 
-        {isLoading && (
-          <>
-            {Array.from(new Array(4)).map((_, index) => (
-              <Grid item {...gridSizes} key={`loading-more-${index}`}>
-                <VideoSkeleton layout={cardLayout} />
-              </Grid>
-            ))}
-          </>
-        )}
-      </Grid>
+      {isLoading && (
+        <>
+          {Array.from(new Array(4)).map((_, index) => (
+            <VideoSkeleton key={`loading-more-${index}`} layout={cardLayout} />
+          ))}
+        </>
+      )}
     </Box>
   );
 };

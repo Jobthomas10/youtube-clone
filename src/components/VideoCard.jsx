@@ -391,7 +391,7 @@ const VideoCard = ({ video, layout }) => {
               sx={{ 
                 color: 'text.primary',
                 lineHeight: '1.2rem',
-                maxHeight: '2.4rem',
+                height: '2.4rem',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 display: '-webkit-box',
