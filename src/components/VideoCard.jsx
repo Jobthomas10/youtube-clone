@@ -56,6 +56,14 @@ export const formatTimeAgo = (dateString) => {
   return 'Just now';
 };
 
+// Decode HTML Entities (e.g. &#39; to ', &amp; to &)
+export const decodeHtmlEntities = (str) => {
+  if (!str) return '';
+  const txt = document.createElement('textarea');
+  txt.innerHTML = str;
+  return txt.value;
+};
+
 const VideoCard = ({ video, layout }) => {
   const { favorites, toggleFavorite, addToHistory } = useContext(AppContext);
   const [isHovered, setIsHovered] = useState(false);
@@ -78,8 +86,8 @@ const VideoCard = ({ video, layout }) => {
   };
 
   const thumbnail = video?.snippet?.thumbnails?.high?.url || video?.snippet?.thumbnails?.medium?.url;
-  const title = video?.snippet?.title || 'No title';
-  const channelTitle = video?.snippet?.channelTitle || 'Unknown Channel';
+  const title = decodeHtmlEntities(video?.snippet?.title || 'No title');
+  const channelTitle = decodeHtmlEntities(video?.snippet?.channelTitle || 'Unknown Channel');
   const publishedAt = video?.snippet?.publishedAt;
   const viewCount = video?.statistics?.viewCount;
 
@@ -248,7 +256,7 @@ const VideoCard = ({ video, layout }) => {
                     mt: '4px'
                   }}
                 >
-                  {video?.snippet?.description || 'No description available.'}
+                  {decodeHtmlEntities(video?.snippet?.description) || 'No description available.'}
                 </Typography>
               </>
             ) : (
@@ -366,7 +374,7 @@ const VideoCard = ({ video, layout }) => {
               borderRadius: '50%', 
               overflow: 'hidden', 
               flexShrink: 0,
-              display: { xs: 'none', sm: 'block' }
+              display: 'block'
             }}
           >
             <img 

@@ -120,7 +120,7 @@ const Feed = ({ selectedCategory, setSelectedCategory }) => {
             fontFamily: '"Outfit", sans-serif'
           }}
         >
-          {selectedCategory} <span style={{ color: '#ff0000' }}>Videos</span>
+          {selectedCategory === 'Home' ? 'Trending' : <>{selectedCategory} <span style={{ color: '#ff0000' }}>Videos</span></>}
         </Typography>
 
         {error && (

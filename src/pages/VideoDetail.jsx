@@ -10,7 +10,7 @@ import { fetchFromApi } from '../services/youtubeApi';
 import Videos from '../components/Videos';
 import Loader from '../components/Loader';
 import { AppContext } from '../App';
-import { formatViews, formatTimeAgo } from '../components/VideoCard';
+import { formatViews, formatTimeAgo, decodeHtmlEntities } from '../components/VideoCard';
 
 const VideoDetail = () => {
   const { id } = useParams();
@@ -94,7 +94,10 @@ const VideoDetail = () => {
     );
   }
 
-  const { title, channelTitle, description, publishedAt } = videoDetail.snippet;
+  const { title: rawTitle, channelTitle: rawChannelTitle, description: rawDescription, publishedAt } = videoDetail.snippet;
+  const title = decodeHtmlEntities(rawTitle);
+  const channelTitle = decodeHtmlEntities(rawChannelTitle);
+  const description = decodeHtmlEntities(rawDescription);
   const { viewCount, likeCount } = videoDetail.statistics || {};
   const channelAvatar = channelDetail?.snippet?.thumbnails?.default?.url;
   const subscriberCount = channelDetail?.statistics?.subscriberCount;

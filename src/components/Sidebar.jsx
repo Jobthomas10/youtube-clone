@@ -4,11 +4,10 @@ import { Stack, Button, Box, Divider, Typography } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
-import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import CodeIcon from '@mui/icons-material/Code';
 import SchoolIcon from '@mui/icons-material/School';
-import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import HistoryIcon from '@mui/icons-material/History';
@@ -21,11 +20,10 @@ export const categories = [
   { name: 'Home', icon: <HomeIcon /> },
   { name: 'Music', icon: <MusicNoteIcon /> },
   { name: 'Gaming', icon: <SportsEsportsIcon /> },
-  { name: 'Sports', icon: <EmojiEventsIcon /> },
   { name: 'News', icon: <NewspaperIcon /> },
-  { name: 'Movies', icon: <OndemandVideoIcon /> },
+  { name: 'Sports', icon: <EmojiEventsIcon /> },
+  { name: 'Coding', icon: <CodeIcon /> },
   { name: 'Education', icon: <SchoolIcon /> },
-  { name: 'Technology', icon: <DeveloperModeIcon /> },
 ];
 
 const Sidebar = ({ selectedCategory, setSelectedCategory, isMobile, onCloseMobileDrawer }) => {
