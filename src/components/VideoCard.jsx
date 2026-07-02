@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardMedia, Typography, Box, IconButton, Tooltip } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Box, IconButton, Tooltip, Avatar } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -60,8 +60,12 @@ const VideoCard = ({ video, layout }) => {
   const { favorites, toggleFavorite, addToHistory } = useContext(AppContext);
   const [isHovered, setIsHovered] = useState(false);
 
-  const videoId = video?.id?.videoId || video?.id;
-  const isFavorited = favorites.some((fav) => (fav.id?.videoId || fav.id) === videoId);
+  // Fix: Extract string video ID and match favorites correctly
+  const videoId = typeof video?.id === 'object' ? video?.id?.videoId : video?.id;
+  const isFavorited = favorites.some((fav) => {
+    const favId = typeof fav.id === 'object' ? fav.id?.videoId : fav.id;
+    return favId === videoId;
+  });
 
   const handleFavoriteClick = (e) => {
     e.preventDefault();
@@ -79,7 +83,8 @@ const VideoCard = ({ video, layout }) => {
   const publishedAt = video?.snippet?.publishedAt;
   const viewCount = video?.statistics?.viewCount;
 
-  const isHorizontal = layout === 'horizontal';
+  const isHorizontal = layout === 'horizontal' || layout === 'search';
+  const isSearch = layout === 'search';
 
   if (isHorizontal) {
     return (
@@ -95,13 +100,34 @@ const VideoCard = ({ video, layout }) => {
           borderRadius: 0, 
           backgroundColor: 'transparent',
           cursor: 'pointer',
-          gap: '8px',
           mb: 1.5
         }}
       >
-        <Link to={videoId ? `/video/${videoId}` : `/video/dQw4w9WgXcQ`} style={{ textDecoration: 'none', display: 'flex', width: '100%', gap: '8px' }}>
+        <Link 
+          to={videoId ? `/video/${videoId}` : `/video/dQw4w9WgXcQ`} 
+          style={{ 
+            textDecoration: 'none', 
+            display: 'flex', 
+            width: '100%', 
+            gap: isSearch ? '16px' : '8px' 
+          }}
+        >
           {/* Left: Thumbnail */}
-          <Box sx={{ width: { xs: '130px', sm: '150px', md: '160px' }, flexShrink: 0, position: 'relative', pt: { xs: '73px', sm: '84.37px', md: '90px' }, borderRadius: '8px', overflow: 'hidden', backgroundColor: '#000' }}>
+          <Box 
+            sx={{ 
+              width: isSearch 
+                ? { xs: '140px', sm: '240px', md: '280px', lg: '320px' } 
+                : { xs: '130px', sm: '150px', md: '160px' }, 
+              flexShrink: 0, 
+              position: 'relative', 
+              pt: isSearch 
+                ? { xs: '78.75px', sm: '135px', md: '157.5px', lg: '180px' } 
+                : { xs: '73px', sm: '84.37px', md: '90px' }, 
+              borderRadius: '8px', 
+              overflow: 'hidden', 
+              backgroundColor: '#000' 
+            }}
+          >
             <CardMedia
               component="img"
               image={thumbnail || 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=500&auto=format&fit=crop&q=60'}
@@ -121,28 +147,30 @@ const VideoCard = ({ video, layout }) => {
             <Box 
               sx={{ 
                 position: 'absolute', 
-                top: 4, 
-                right: 4, 
+                top: isSearch ? 8 : 4, 
+                right: isSearch ? 8 : 4, 
                 zIndex: 10,
                 opacity: isHovered || isFavorited ? 1 : 0,
                 transition: 'opacity 0.2s ease-in-out',
               }}
             >
-              <IconButton 
-                onClick={handleFavoriteClick}
-                size="small"
-                sx={{ 
-                  backgroundColor: 'rgba(0, 0, 0, 0.6)', 
-                  color: isFavorited ? '#ff0000' : '#ffffff',
-                  p: '4px',
-                  '&:hover': { 
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    color: '#ff0000',
-                  } 
-                }}
-              >
-                <FavoriteIcon sx={{ fontSize: '14px' }} />
-              </IconButton>
+              <Tooltip title={isFavorited ? "Remove from Favorites" : "Add to Favorites"}>
+                <IconButton 
+                  onClick={handleFavoriteClick}
+                  size="small"
+                  sx={{ 
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)', 
+                    color: isFavorited ? '#ff0000' : '#ffffff',
+                    p: isSearch ? '6px' : '4px',
+                    '&:hover': { 
+                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                      color: '#ff0000',
+                    } 
+                  }}
+                >
+                  {isFavorited ? <FavoriteIcon sx={{ fontSize: isSearch ? '18px' : '14px' }} /> : <FavoriteBorderIcon sx={{ fontSize: isSearch ? '18px' : '14px' }} />}
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
 
@@ -150,39 +178,96 @@ const VideoCard = ({ video, layout }) => {
           <Box sx={{ flex: 1, minWidth: 0, pt: '2px' }}>
             <Typography 
               variant="body2" 
-              fontWeight={600} 
+              fontWeight={isSearch ? 600 : 500} 
               sx={{ 
                 color: 'text.primary',
-                lineHeight: '1.1rem',
-                maxHeight: '2.2rem',
+                lineHeight: isSearch ? '1.4rem' : '1.1rem',
+                maxHeight: isSearch ? '2.8rem' : '2.2rem',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 mb: '3px',
-                fontSize: '0.85rem'
+                fontSize: isSearch 
+                  ? { xs: '0.85rem', sm: '1.05rem', md: '1.15rem' } 
+                  : '0.85rem'
               }}
             >
               {title}
             </Typography>
+
             <Typography 
               variant="caption" 
               sx={{ 
                 color: 'text.secondary', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '2px',
-                mb: '1px',
-                '&:hover': { color: 'text.primary' }
+                fontSize: isSearch ? { xs: '0.72rem', sm: '0.78rem' } : '0.72rem' 
               }}
             >
-              {channelTitle}
-              <CheckCircleIcon sx={{ fontSize: '10px', color: 'gray' }} />
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
               {formatViews(viewCount)} • {formatTimeAgo(publishedAt)}
             </Typography>
+
+            {isSearch ? (
+              <>
+                {/* Channel row with avatar in search layout */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', my: { xs: '4px', sm: '8px' } }}>
+                  <Avatar 
+                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(channelTitle)}`} 
+                    alt={channelTitle} 
+                    sx={{ width: 24, height: 24 }}
+                  />
+                  <Typography 
+                    variant="caption" 
+                    sx={{ 
+                      color: 'text.secondary', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '2px',
+                      fontSize: { xs: '0.72rem', sm: '0.78rem' },
+                      '&:hover': { color: 'text.primary' }
+                    }}
+                  >
+                    {channelTitle}
+                    <CheckCircleIcon sx={{ fontSize: '11px', color: 'gray', ml: '2px' }} />
+                  </Typography>
+                </Box>
+
+                {/* Description snippet for search result */}
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    color: 'text.secondary',
+                    display: { xs: 'none', sm: '-webkit-box' },
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    lineHeight: '1.2rem',
+                    maxHeight: '2.4rem',
+                    fontSize: '0.78rem',
+                    mt: '4px'
+                  }}
+                >
+                  {video?.snippet?.description || 'No description available.'}
+                </Typography>
+              </>
+            ) : (
+              /* Simple channel line for related layout */
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'text.secondary', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '2px',
+                  mt: '2px',
+                  '&:hover': { color: 'text.primary' }
+                }}
+              >
+                {channelTitle}
+                <CheckCircleIcon sx={{ fontSize: '10px', color: 'gray' }} />
+              </Typography>
+            )}
           </Box>
         </Link>
       </Card>

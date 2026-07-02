@@ -136,7 +136,15 @@ function App() {
               } 
             />
             <Route path="/video/:id" element={<VideoDetail />} />
-            <Route path="/search/:searchTerm" element={<SearchFeed />} />
+            <Route 
+              path="/search/:searchTerm" 
+              element={
+                <SearchFeed 
+                  selectedCategory={selectedCategory} 
+                  setSelectedCategory={handleCategoryChange} 
+                />
+              } 
+            />
           </Routes>
 
           {/* Responsive Left Temporary Sidebar Drawer for Mobile */}

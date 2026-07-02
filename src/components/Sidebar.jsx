@@ -56,7 +56,9 @@ const Sidebar = ({ selectedCategory, setSelectedCategory, isMobile, onCloseMobil
       direction="column"
       sx={{
         overflowY: 'auto',
-        height: isMobile ? '100%' : '92vh',
+        position: isMobile ? 'static' : 'sticky',
+        top: isMobile ? 'auto' : '73px',
+        height: isMobile ? '100%' : 'calc(100vh - 73px)',
         width: isMobile ? '100%' : '240px',
         borderRight: (theme) => 
           isMobile ? 'none' : `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,

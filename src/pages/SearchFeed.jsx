@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, Alert } from '@mui/material';
+import { Box, Typography, Alert, Stack } from '@mui/material';
 import Videos from '../components/Videos';
+import Sidebar from '../components/Sidebar';
 import { fetchFromApi } from '../services/youtubeApi';
 
-const SearchFeed = () => {
+const SearchFeed = ({ selectedCategory, setSelectedCategory }) => {
   const { searchTerm } = useParams();
   const [videos, setVideos] = useState([]);
   const [nextPageToken, setNextPageToken] = useState('');
@@ -75,42 +76,54 @@ const SearchFeed = () => {
   }, [nextPageToken, fetchSearchVideos]);
 
   return (
-    <Box 
-      p={{ xs: 1.5, sm: 2, md: 3 }} 
-      sx={{ 
-        overflowY: 'auto', 
-        minHeight: '92vh', 
-        backgroundColor: 'background.default',
-        width: '100%'
-      }}
-    >
-      <Typography 
-        variant="h5" 
-        fontWeight="bold" 
-        mb={3} 
+    <Stack sx={{ flexDirection: { xs: 'column', md: 'row' }, minHeight: '92vh' }}>
+      {/* Sidebar: Visible on desktop, hidden on mobile */}
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+        <Sidebar 
+          selectedCategory={selectedCategory} 
+          setSelectedCategory={setSelectedCategory} 
+          isMobile={false}
+        />
+      </Box>
+
+      {/* Main Video Area */}
+      <Box 
+        p={{ xs: 1.5, sm: 2, md: 3 }} 
         sx={{ 
-          color: 'text.primary',
-          fontFamily: '"Outfit", sans-serif'
+          overflowY: 'auto', 
+          flex: 1, 
+          backgroundColor: 'background.default',
+          width: '100%'
         }}
       >
-        Search Results for: <span style={{ color: '#ff0000' }}>{decodeURIComponent(searchTerm)}</span>
-      </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Grid of Search Video Results */}
-      {!isLoading && videos.length === 0 ? (
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 4, textAlign: 'center' }}>
-          No videos found matching your search. Try searching for "React", "Gaming", "Despacito", or "SpaceX".
+        <Typography 
+          variant="h5" 
+          fontWeight="bold" 
+          mb={3} 
+          sx={{ 
+            color: 'text.primary',
+            fontFamily: '"Outfit", sans-serif'
+          }}
+        >
+          Search Results for: <span style={{ color: '#ff0000' }}>{decodeURIComponent(searchTerm)}</span>
         </Typography>
-      ) : (
-        <Videos videos={videos} isLoading={isLoading} />
-      )}
-    </Box>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
+            {error}
+          </Alert>
+        )}
+
+        {/* Grid of Search Video Results */}
+        {!isLoading && videos.length === 0 ? (
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 4, textAlign: 'center' }}>
+            No videos found matching your search. Try searching for "React", "Gaming", "Despacito", or "SpaceX".
+          </Typography>
+        ) : (
+          <Videos videos={videos} isLoading={isLoading} layout="search" />
+        )}
+      </Box>
+    </Stack>
   );
 };
 
